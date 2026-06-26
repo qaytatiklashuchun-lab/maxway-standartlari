@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MAXWAY — Bilim Testi</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&family=Open+Sans:wght@400;600&display=swap');
+
+:root {
+  --yellow: #FFD600;
+  --purple: #7B5EA7;
+  --purple-dark: #5A4080;
+  --purple-light: #EDE8F5;
+  --white: #FFFFFF;
+  --bg: #F2F0F7;
+  --text: #1A1A2E;
+  --correct: #27AE60;
+  --wrong: #E74C3C;
+  --shadow: 0 8px 32px rgba(123,94,167,0.14);
+  --spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Open Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ===== HEADER ===== */
+header {
+  background: var(--purple);
+  position: sticky; top: 0; z-index: 200;
+  box-shadow: 0 2px 20px rgba(0,0,0,0.22);
+}
+.header-inner {
+  display: flex; align-items: center; justify-content: space-between;
+  max-width: 880px; margin: 0 auto; padding: 14px 22px;
+}
+.logo {
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 1.9rem; color: var(--yellow); letter-spacing: -2px; line-height: 1;
+}
+.logo span { color: #fff; }
+.hdr-sub {
+  font-family: 'Montserrat', sans-serif; color: rgba(255,255,255,0.65);
+  font-size: 0.75rem; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase;
+}
+.stripe { height: 5px; background: var(--yellow); }
+
+/* ===== MAIN ===== */
+main { max-width: 860px; margin: 0 auto; padding: 32px 16px 80px; }
+
+/* ===== PAGE TRANSITIONS ===== */
+.page {
+  animation: pageIn 0.55s var(--ease-out) both;
+}
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(28px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.page-exit {
+  animation: pageOut 0.32s var(--ease-out) both;
+}
+@keyframes pageOut {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(-18px) scale(0.97); }
+}
+
+/* ===== CARD ===== */
+.card {
+  background: var(--white); border-radius: 22px;
+  box-shadow: var(--shadow); padding: 38px 34px; margin-bottom: 20px;
+  backdrop-filter: blur(8px);
+}
+
+/* ===== SETUP ===== */
+.setup-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 1.65rem; color: var(--purple); margin-bottom: 5px;
+}
+.setup-desc { color: #777; font-size: 0.93rem; margin-bottom: 28px; line-height: 1.5; }
+
+.opt-label {
+  font-family: 'Montserrat', sans-serif; font-weight: 800;
+  font-size: 0.78rem; color: var(--purple-dark); text-transform: uppercase;
+  letter-spacing: 1px; margin-bottom: 11px; margin-top: 24px;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* ===== TOPIC GRID ===== */
+.topic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 9px; margin-bottom: 6px;
+}
+.topic-btn {
+  border: 2px solid #DDD5F0; border-radius: 13px;
+  background: var(--white); padding: 12px 14px;
+  font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.78rem;
+  color: var(--purple); cursor: pointer;
+  transition: border-color 0.18s, background 0.18s, transform 0.18s var(--spring), box-shadow 0.18s;
+  text-align: left; display: flex; align-items: center; gap: 9px;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+.topic-btn:hover { border-color: var(--purple); background: var(--purple-light); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(123,94,167,0.18); }
+.topic-btn:active { transform: scale(0.95); }
+.topic-btn.active {
+  border-color: var(--purple); background: var(--purple); color: #fff;
+  box-shadow: 0 4px 16px rgba(123,94,167,0.35);
+}
+.topic-btn.active:hover { background: var(--purple-dark); transform: translateY(-2px); }
+.topic-btn .ti { font-size: 1.15rem; }
+
+/* per-topic count badge */
+.topic-btn .t-count {
+  margin-left: auto; background: rgba(255,255,255,0.25);
+  border-radius: 99px; padding: 1px 8px; font-size: 0.72rem;
+  font-weight: 800; color: rgba(255,255,255,0.9);
+  display: none;
+}
+.topic-btn.active .t-count { display: inline; }
+
+.sel-row { display: flex; gap: 12px; margin-bottom: 10px; }
+.link-btn {
+  background: none; border: none; color: var(--purple);
+  font-family: 'Montserrat', sans-serif; font-weight: 700; font-size: 0.8rem;
+  cursor: pointer; text-decoration: underline; padding: 0;
+  transition: opacity 0.15s;
+}
+.link-btn:hover { opacity: 0.65; }
+
+/* ===== COUNT SLIDER ===== */
+.count-row { display: flex; align-items: center; gap: 18px; margin-top: 4px; }
+.count-box {
+  font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 2.2rem;
+  color: var(--yellow); background: var(--purple); border-radius: 14px;
+  width: 70px; text-align: center; padding: 6px 0; line-height: 1.1;
+  transition: transform 0.2s var(--spring);
+  flex-shrink: 0;
+}
+.count-box.bump { animation: bump 0.35s var(--spring); }
+@keyframes bump {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+input[type=range] {
+  flex: 1; accent-color: var(--purple); height: 6px; cursor: pointer;
+  border-radius: 99px;
+}
+.count-hint { font-size: 0.78rem; color: #aaa; margin-top: 5px; }
+
+/* Per-category info */
+.per-cat-info {
+  margin-top: 10px; padding: 10px 14px; background: var(--purple-light);
+  border-radius: 10px; font-size: 0.82rem; color: var(--purple-dark);
+  font-family: 'Montserrat', sans-serif; font-weight: 600;
+  display: none;
+}
+
+/* ===== START BTN ===== */
+.start-btn {
+  width: 100%; padding: 18px; background: var(--yellow);
+  border: none; border-radius: 14px;
+  font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.1rem;
+  color: var(--purple-dark); cursor: pointer; margin-top: 28px;
+  letter-spacing: 0.4px;
+  transition: transform 0.22s var(--spring), box-shadow 0.22s;
+  box-shadow: 0 5px 20px rgba(255,214,0,0.38);
+  position: relative; overflow: hidden;
+}
+.start-btn::after {
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,0); transition: background 0.18s;
+}
+.start-btn:hover { transform: translateY(-3px) scale(1.01); box-shadow: 0 10px 28px rgba(255,214,0,0.48); }
+.start-btn:hover::after { background: rgba(255,255,255,0.08); }
+.start-btn:active { transform: scale(0.97); }
+.start-btn:disabled { background: #ddd; color: #aaa; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.error-box {
+  background: #FFF5F5; border: 2px solid #FFCDD2; border-radius: 12px;
+  padding: 14px 18px; color: #C62828; font-size: 0.9rem; margin-top: 14px;
+  display: none; animation: shake 0.4s var(--spring);
+}
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+
+/* ===== LOADING ===== */
+#loading { display: none; }
+.loading-card {
+  background: var(--white); border-radius: 22px; box-shadow: var(--shadow);
+  padding: 64px 36px; text-align: center;
+  animation: pageIn 0.5s var(--ease-out) both;
+}
+.spinner-wrap { position: relative; width: 72px; height: 72px; margin: 0 auto 24px; }
+.spin-ring {
+  position: absolute; inset: 0; border-radius: 50%;
+  border: 6px solid transparent;
+}
+.spin-ring:nth-child(1) {
+  border-top-color: var(--purple); border-right-color: var(--purple-light);
+  animation: spin 1s linear infinite;
+}
+.spin-ring:nth-child(2) {
+  border-bottom-color: var(--yellow); border-left-color: transparent;
+  animation: spin 1.4s linear infinite reverse;
+  inset: 10px;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.loading-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 1.1rem; color: var(--purple); margin-bottom: 6px;
+}
+.loading-dots { display: inline-flex; gap: 5px; margin-top: 10px; }
+.loading-dots span {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--purple);
+  animation: dot-bounce 1.2s ease-in-out infinite;
+}
+.loading-dots span:nth-child(2) { animation-delay: 0.2s; background: var(--yellow); }
+.loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes dot-bounce {
+  0%,80%,100% { transform: translateY(0) scale(1); }
+  40% { transform: translateY(-10px) scale(1.2); }
+}
+
+/* ===== QUIZ ===== */
+#quiz-area { display: none; }
+
+/* Progress */
+.progress-outer {
+  background: rgba(123,94,167,0.12); border-radius: 99px;
+  height: 8px; margin-bottom: 8px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--purple) 0%, var(--yellow) 100%);
+  border-radius: 99px;
+  transition: width 0.6s var(--ease-out);
+}
+.progress-meta {
+  display: flex; justify-content: space-between;
+  font-family: 'Montserrat', sans-serif; font-weight: 700;
+  font-size: 0.8rem; color: #999; margin-bottom: 18px;
+}
+.score-pills { display: flex; gap: 8px; }
+.pill {
+  padding: 2px 10px; border-radius: 99px; font-size: 0.78rem; font-weight: 800;
+}
+.pill.c { background: #EAFAF1; color: var(--correct); }
+.pill.w { background: #FDEDEC; color: var(--wrong); }
+
+/* Category track strip */
+.cat-strip {
+  display: flex; gap: 4px; margin-bottom: 18px; overflow-x: auto;
+  padding-bottom: 2px; -webkit-overflow-scrolling: touch;
+}
+.cat-dot {
+  flex-shrink: 0; height: 6px; border-radius: 99px;
+  background: rgba(123,94,167,0.18);
+  transition: background 0.3s, flex 0.3s var(--ease-out);
+  flex: 1;
+}
+.cat-dot.done { background: var(--purple); }
+.cat-dot.current { background: var(--yellow); flex: 2; }
+
+/* Question card */
+.q-card {
+  background: var(--white); border-radius: 22px; box-shadow: var(--shadow);
+  padding: 32px 30px 26px; margin-bottom: 16px;
+  transform-origin: top center;
+}
+.q-card.enter {
+  animation: qEnter 0.48s var(--spring) both;
+}
+@keyframes qEnter {
+  from { opacity: 0; transform: translateY(30px) scale(0.95) rotateX(4deg); }
+  to   { opacity: 1; transform: translateY(0) scale(1) rotateX(0); }
+}
+.q-card.exit-left {
+  animation: qExitL 0.3s var(--ease-out) both;
+}
+@keyframes qExitL {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(-40px) scale(0.95); }
+}
+.q-card.exit-right {
+  animation: qExitR 0.3s var(--ease-out) both;
+}
+@keyframes qExitR {
+  from { opacity: 1; transform: translateX(0) scale(1); }
+  to   { opacity: 0; transform: translateX(40px) scale(0.95); }
+}
+
+.q-badge {
+  display: inline-block; background: var(--purple); color: var(--yellow);
+  font-family: 'Montserrat', sans-serif; font-weight: 800;
+  font-size: 0.7rem; border-radius: 8px; padding: 3px 11px;
+  letter-spacing: 1px; text-transform: uppercase; margin-bottom: 14px;
+}
+.q-text {
+  font-family: 'Montserrat', sans-serif; font-weight: 800;
+  font-size: 1.08rem; line-height: 1.58; color: var(--text); margin-bottom: 22px;
+}
+
+/* Options */
+.options { display: flex; flex-direction: column; gap: 10px; }
+.option {
+  border: 2.5px solid #E0D8EF; border-radius: 13px;
+  padding: 14px 16px; background: var(--white);
+  font-family: 'Open Sans', sans-serif; font-size: 0.93rem; color: var(--text);
+  cursor: pointer; text-align: left; display: flex; align-items: center; gap: 13px;
+  transition: border-color 0.18s, background 0.18s, transform 0.22s var(--spring), box-shadow 0.18s;
+  -webkit-tap-highlight-color: transparent; user-select: none;
+  animation: optIn 0.4s var(--spring) both;
+}
+.option:nth-child(1) { animation-delay: 0.04s; }
+.option:nth-child(2) { animation-delay: 0.1s; }
+.option:nth-child(3) { animation-delay: 0.16s; }
+.option:nth-child(4) { animation-delay: 0.22s; }
+@keyframes optIn {
+  from { opacity: 0; transform: translateX(-16px) scale(0.97); }
+  to   { opacity: 1; transform: translateX(0) scale(1); }
+}
+.option:hover:not(:disabled) {
+  border-color: var(--purple); background: var(--purple-light);
+  transform: translateX(4px) scale(1.01);
+  box-shadow: 0 4px 14px rgba(123,94,167,0.16);
+}
+.option:active:not(:disabled) { transform: scale(0.97); }
+.opt-letter {
+  width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0;
+  background: var(--purple-light); color: var(--purple-dark);
+  font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.82rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.22s var(--spring);
+}
+.option.correct {
+  border-color: var(--correct); background: #EAFAF1;
+  transform: scale(1.02);
+  box-shadow: 0 6px 18px rgba(39,174,96,0.2);
+  animation: correctPop 0.45s var(--spring) both;
+}
+@keyframes correctPop {
+  0%   { transform: scale(1); }
+  40%  { transform: scale(1.05); }
+  100% { transform: scale(1.02); }
+}
+.option.correct .opt-letter { background: var(--correct); color: #fff; }
+.option.wrong {
+  border-color: var(--wrong); background: #FDEDEC;
+  animation: wrongShake 0.4s var(--spring) both;
+}
+@keyframes wrongShake {
+  0%,100% { transform: translateX(0) scale(1); }
+  20% { transform: translateX(-6px) scale(1.01); }
+  40% { transform: translateX(6px) scale(1.01); }
+  60% { transform: translateX(-4px); }
+  80% { transform: translateX(4px); }
+}
+.option.wrong .opt-letter { background: var(--wrong); color: #fff; }
+.option:disabled { cursor: default; }
+
+/* Explanation */
+.explanation {
+  margin-top: 16px; padding: 14px 18px;
+  border-radius: 12px; background: var(--purple-light);
+  border-left: 4px solid var(--purple);
+  font-size: 0.88rem; color: var(--purple-dark); line-height: 1.65;
+  display: none;
+  animation: expIn 0.45s var(--spring) both;
+}
+@keyframes expIn {
+  from { opacity: 0; transform: translateY(10px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Nav */
+.nav-row { display: flex; gap: 11px; margin-top: 4px; }
+.nav-btn {
+  flex: 1; padding: 15px; border: none; border-radius: 13px;
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.95rem;
+  cursor: pointer; transition: transform 0.22s var(--spring), box-shadow 0.18s, background 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.nav-btn:active { transform: scale(0.95) !important; }
+.next-btn { background: var(--purple); color: #fff; box-shadow: 0 4px 14px rgba(123,94,167,0.3); }
+.next-btn:hover:not(:disabled) { background: var(--purple-dark); transform: translateY(-2px); box-shadow: 0 8px 22px rgba(123,94,167,0.38); }
+.next-btn:disabled { background: #ddd; color: #bbb; cursor: not-allowed; box-shadow: none; }
+.skip-btn { background: rgba(123,94,167,0.08); color: #aaa; flex: 0 0 auto; padding: 15px 20px; }
+.skip-btn:hover { background: rgba(123,94,167,0.14); color: #888; transform: translateY(-1px); }
+
+/* ===== RESULTS ===== */
+#results { display: none; }
+.results-card {
+  background: var(--white); border-radius: 22px; box-shadow: var(--shadow);
+  padding: 46px 34px; text-align: center; margin-bottom: 20px;
+  animation: pageIn 0.6s var(--spring) both;
+}
+.score-ring {
+  width: 136px; height: 136px; border-radius: 50%;
+  background: var(--purple);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  margin: 0 auto 24px;
+  box-shadow: 0 0 0 12px var(--purple-light), 0 8px 32px rgba(123,94,167,0.3);
+  animation: ringPop 0.7s var(--spring) 0.2s both;
+}
+@keyframes ringPop {
+  from { transform: scale(0.5) rotate(-20deg); opacity: 0; }
+  to   { transform: scale(1) rotate(0); opacity: 1; }
+}
+.score-num {
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 3rem; color: var(--yellow); line-height: 1;
+}
+.score-tot { color: rgba(255,255,255,0.6); font-size: 0.85rem; font-weight: 600; }
+.res-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 1.55rem; color: var(--purple); margin-bottom: 7px;
+  animation: pageIn 0.5s var(--ease-out) 0.4s both;
+}
+.res-msg { color: #777; font-size: 0.95rem; margin-bottom: 28px; animation: pageIn 0.5s var(--ease-out) 0.5s both; }
+.stats-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 12px; margin-bottom: 28px;
+  animation: pageIn 0.5s var(--ease-out) 0.55s both;
+}
+.stat-box {
+  border-radius: 14px; padding: 16px 8px; background: var(--bg);
+  transition: transform 0.22s var(--spring);
+}
+.stat-box:hover { transform: translateY(-3px); }
+.stat-n { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.9rem; color: var(--purple); }
+.stat-l { font-size: 0.73rem; color: #aaa; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.btn-row { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; animation: pageIn 0.5s var(--ease-out) 0.65s both; }
+.res-btn {
+  border: none; border-radius: 13px; padding: 14px 28px;
+  font-family: 'Montserrat', sans-serif; font-weight: 800; font-size: 0.95rem;
+  cursor: pointer; transition: transform 0.22s var(--spring), box-shadow 0.18s;
+  -webkit-tap-highlight-color: transparent;
+}
+.res-btn:active { transform: scale(0.95); }
+.res-btn.primary { background: var(--yellow); color: var(--purple-dark); box-shadow: 0 4px 16px rgba(255,214,0,0.35); }
+.res-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(255,214,0,0.45); }
+.res-btn.secondary { background: var(--purple-light); color: var(--purple); }
+.res-btn.secondary:hover { background: #DDD4F0; transform: translateY(-2px); }
+
+/* Review */
+.review-title {
+  font-family: 'Montserrat', sans-serif; font-weight: 800;
+  font-size: 1.05rem; color: var(--purple); margin-bottom: 12px;
+}
+.review-item {
+  background: var(--white); border-radius: 14px; padding: 18px 20px;
+  margin-bottom: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+  border-left: 5px solid var(--correct);
+  animation: pageIn 0.4s var(--ease-out) both;
+}
+.review-item.wrong { border-left-color: var(--wrong); }
+.review-q { font-weight: 700; font-size: 0.88rem; margin-bottom: 7px; margin-top: 5px; }
+.review-a { font-size: 0.83rem; color: #666; }
+.rv-ok { color: var(--correct); font-weight: 700; }
+.rv-err { color: var(--wrong); font-weight: 700; }
+
+/* Category break header in quiz */
+.cat-header {
+  text-align: center; padding: 14px;
+  font-family: 'Montserrat', sans-serif; font-weight: 900;
+  font-size: 0.85rem; color: var(--purple); letter-spacing: 0.5px;
+  text-transform: uppercase; opacity: 0.6;
+}
+
+/* Confetti canvas */
+#confetti-canvas {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 999; display: none;
+}
+
+@media (max-width: 580px) {
+  .card, .q-card, .results-card { padding: 20px 16px; }
+  .topic-grid { grid-template-columns: 1fr 1fr; }
+  .stats-grid { gap: 8px; }
+  .setup-title { font-size: 1.3rem; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="confetti-canvas"></canvas>
+
+<header>
+  <div class="header-inner">
+    <div class="logo">max<span>way</span></div>
+    <div class="hdr-sub">Xodimlar Bilim Testi</div>
+  </div>
+</header>
+<div class="stripe"></div>
+
+<main>
+
+<!-- ===== SETUP ===== -->
+<div id="setup" class="page">
+  <div class="card">
+    <div class="setup-title">MAXWAY Bilim Testi 🎯</div>
+    <div class="setup-desc">Har bir tanlangan mavzudan bir xil miqdorda savol beriladi. Savollar aralashtirilgan tartibda keladi.</div>
+
+    <div class="opt-label">📚 Mavzularni tanlang</div>
+    <div class="sel-row">
+      <button class="link-btn" onclick="selectAll(true)">Barchasini tanlash</button>
+      <button class="link-btn" onclick="selectAll(false)">Bekor qilish</button>
+    </div>
+    <div class="topic-grid" id="topic-grid">
+      <button class="topic-btn active" data-topic="appearance" onclick="toggleTopic(this)">
+        <span class="ti">👔</span> Tashqi ko'rinish<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="hygiene" onclick="toggleTopic(this)">
+        <span class="ti">🧼</span> Shaxsiy gigiyena<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="service" onclick="toggleTopic(this)">
+        <span class="ti">🤝</span> Xizmat ko'rsatish<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="food_safety" onclick="toggleTopic(this)">
+        <span class="ti">🍔</span> Oziq-ovqat xavfsizligi<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="storage" onclick="toggleTopic(this)">
+        <span class="ti">🌡️</span> Saqlash standartlari<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="cooking" onclick="toggleTopic(this)">
+        <span class="ti">🍳</span> Pishirish standartlari<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="cashier" onclick="toggleTopic(this)">
+        <span class="ti">💰</span> Kassa va to'lov<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="cleaning" onclick="toggleTopic(this)">
+        <span class="ti">🧹</span> Tozalash standartlari<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="mst" onclick="toggleTopic(this)">
+        <span class="ti">⭐</span> MST tamoyili<span class="t-count">—</span>
+      </button>
+      <button class="topic-btn active" data-topic="recipes" onclick="toggleTopic(this)">
+        <span class="ti">📋</span> Stansion kartalar<span class="t-count">—</span>
+      </button>
+    </div>
+
+    <div class="opt-label">🎯 Har bir mavzudan nechta savol?</div>
+    <div class="count-row">
+      <div class="count-box" id="count-box">5</div>
+      <input type="range" id="cnt-slider" min="1" max="10" step="1" value="5" oninput="updateCount(this.value)">
+    </div>
+    <div class="count-hint" id="count-hint">10 ta mavzu × 5 = <strong>50</strong> ta savol jami</div>
+
+    <div class="error-box" id="err-box">⚠️ Kamida bitta mavzu tanlang!</div>
+    <button class="start-btn" id="start-btn" onclick="startQuiz()">▶ &nbsp;Testni Boshlash</button>
+  </div>
+</div>
+
+<!-- ===== LOADING ===== -->
+<div id="loading">
+  <div class="loading-card">
+    <div class="spinner-wrap">
+      <div class="spin-ring"></div>
+      <div class="spin-ring"></div>
+    </div>
+    <div class="loading-title">Savollar tayyorlanmoqda</div>
+    <div style="color:#aaa;font-size:0.83rem;margin-top:4px">AI har bir mavzudan <span id="gen-per">5</span> ta savol yaratmoqda</div>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div id="quiz-area">
+  <div class="progress-outer">
+    <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+  </div>
+  <div class="progress-meta">
+    <span id="prog-text">Savol 1 / —</span>
+    <div class="score-pills">
+      <span class="pill c" id="pill-c">✅ 0</span>
+      <span class="pill w" id="pill-w">❌ 0</span>
+    </div>
+  </div>
+  <div class="cat-strip" id="cat-strip"></div>
+  <div id="q-wrap">
+    <div class="q-card" id="q-card">
+      <div class="q-badge" id="q-badge">Mavzu</div>
+      <div class="q-text" id="q-text">Savol matni</div>
+      <div class="options" id="opts"></div>
+      <div class="explanation" id="expl"></div>
+    </div>
+  </div>
+  <div class="nav-row">
+    <button class="nav-btn skip-btn" id="skip-btn" onclick="skipQ()">O'tkazish</button>
+    <button class="nav-btn next-btn" id="next-btn" onclick="nextQ()" disabled>Keyingi →</button>
+  </div>
+</div>
+
+<!-- ===== RESULTS ===== -->
+<div id="results">
+  <div class="results-card">
+    <div class="score-ring">
+      <div class="score-num" id="r-score">0</div>
+      <div class="score-tot" id="r-tot">/ 0</div>
+    </div>
+    <div class="res-title" id="r-title">Natija</div>
+    <div class="res-msg" id="r-msg"></div>
+    <div class="stats-grid">
+      <div class="stat-box"><div class="stat-n" id="s-ok" style="color:var(--correct)">0</div><div class="stat-l">To'g'ri</div></div>
+      <div class="stat-box"><div class="stat-n" id="s-err" style="color:var(--wrong)">0</div><div class="stat-l">Noto'g'ri</div></div>
+      <div class="stat-box"><div class="stat-n" id="s-pct">0%</div><div class="stat-l">Foiz</div></div>
+    </div>
+    <div class="btn-row">
+      <button class="res-btn primary" onclick="restartSame()">🔄 Yana o'ynash</button>
+      <button class="res-btn secondary" onclick="goBack()">⬅ Sozlamalar</button>
+    </div>
+  </div>
+  <div class="review-title">📝 Barcha savollar ko'rib chiqish</div>
+  <div id="review-list"></div>
+</div>
+
+</main>
+
+<script>
+// ============================================================
+// KNOWLEDGE BASE
+// ============================================================
+const KB = {
+  appearance:`MAXWAY xodimlari kompaniya tomonidan tasdiqlangan uniformada bo'lishi shart.
+Har bir xodim beydjini doimo taqib yurishi kerak — ko'krak chizig'i ustida chap tomonda.
+Xodimlarga uniformada uydan kelish yoki uyga ketish QATIYAN TAQIQLANADI.
+Tashqi ko'rinishi standartga mos kelmasa, kamchiligi bartaraf etilmaguncha ishga ruxsat berilmaydi.
+Ayol menejerlar: maxsus ko'ylak, to'q rangli shim yoki yubka, poshna 2 sm dan baland bo'lmasligi kerak.
+Erkak menejerlar: maxsus ko'ylak va to'q rangli klassik shim, qora klassik poyabzal.
+PBO xodimlari: sariq polo ko'ylak, fartuk, kompaniya logotipli maxsus bosh kiyim.
+Oyoq kiyimining burni yumoloq bo'lishi, poshna 2 sm dan oshmasligi va sirpanishga chidamli bo'lishi kerak.
+Ishlab chiqish (oshxona) zonasida hamma bir martalik to'r (baxila) kiyishi SHART.
+Sovutgich yoki muzlatgichga kirishda issiq kurtka kiyish zarur.
+Tirnoqlar doimo tekis olingan holatda; bo'yalgan yoki uzun (yopishtirilgan) tirnoqlar TAQIQLANADI.
+Ish vaqtida uzuklar, soat, bilakuzuk, ziraklar taqiqlanadi — faqat nikoh uzukga ruxsat.
+Forma doim yuvilgan va dazmollangan bo'lishi, har kuni yuvilishi kerak.
+Erkaklar yuzi to'liq soqoldan tozalangan bo'lishi kerak, yengil soqolga ham ruxsat etilmaydi.
+Ayollar: sochlar kepka ostida yig'ilgan, soch uzunligi quloq ustiga tushmasligi lozim.`,
+
+  hygiene:`Har kuni dush qabul qilish shart.
+O'tkir hidli parfumeralar yoki yorqin pardozdan foydalanish maqsadga muvofiq emas.
+Tananing ochiq qismlarida tatuirovka bo'lmasligi kerak.
+Qo'l yuvish: ish boshlashdan oldin, keyin va har soatda yoki stansiyalarni almashtirganida.
+Qo'llarni iliq suvda yuvish kerak — sovuq suv to'liq tozalamaydi.
+Qo'llarni tirsakgacha namlash, 1-2 marta sovun bosish, tirsakgacha sovunlash, barmoqlar orasini, kaftlarni, tirnoq ostini yaxshilab ishqalash — kamida 20 soniya.
+Qo'llarni quritayotganda hech qanday yuzaga tekkizmaslik: na forma, na fartuk, na boshqa yuzalarga.
+Qog'oz sochiq bilan quritilsa, jo'mrakni ham sochiq bilan yopish va sochiqni axlatga tashlash kerak.
+Qo'lqoplar kassir va zal xodimlaridan boshqa hammaga MAJBURIY.
+Barmoq uchlarini kesib olingan yoki rangi o'zgargan teshilgan qo'lqoplardan foydalanmang.
+Xodimlar bir-birlarining formalaridan FOYDALANA OLMAYDI.
+Qo'llarni yuvish kerak: smena boshlanishida, qo'lqop ifloslanganida, tana azolariga tegganida, aksirgandan keyin, xojatxonadan keyin, sabzavotlar tayyorlashdan oldin, xom mahsulotlar bilan ishlashda, polni tozalaganida, pul bilan ishlaganida.`,
+
+  service:`MST tamoyili — MADANIYAT, SIFAT VA TOZALIK.
+Mehmonlar kutishlari: sifatli mahsulotlar, xushmuomala xodimlar, aniq va to'g'ri yig'ilgan buyurtma, tezkor xizmat, toza va qulay restoran.
+1-bosqich: Mehmonni kutib olish — ko'z orqali aloqa, tabassum, qo'lni ko'ksiga qo'yib "Assalomu alaykum MAX WAY ga xush kelibsiz".
+2-bosqich: Buyurtma qabul qilish — mehmonning gapini bo'lmasdan tinglash, aktsiyalar va yangiliklarni taklif etish.
+Agar guruhlardan biri bo'lmasa: asosiy taom, kartoshka/salat, shirinlik va ichimlik taklif qilish.
+Bolalarga qo'shimcha taom taklif qilish va ikki marta maslahat berish MUMKIN EMAS.
+Kartoshka uchun souslarni taklif etish maslahatga kirmaydi.
+3-bosqich: Buyurtma yig'ish — padnosga birinchi kondimentlar, issiq taomlar/ichimlik, sovuq ichimlik, kartoshka fri va muzqaymoq.
+Issiq va sovuq taomlar padnosning ikki tomoniga ajratilishi, bir-biriga tegmasligi kerak.
+Mahsulot logotipi mehmonga qaratilgan bo'lishi kerak.
+Olib ketishda issiq va sovuq taomlar har xil paketlarga solinadi.
+4-bosqich: To'lov — buyurtma summasini aytish, to'lov usulini aniqlash. Naqd pul kassa tortmasiga ko'ndalang qo'yiladi. Qaytimni eshitarli qilib aytish. Chekni "Tanlovingiz uchun rahmat" bilan uzatish.
+5-bosqich: Buyurtma berish — "ГОТОВ" tugmasini bosish, "sizni yana kutib qolamiz", "yoqimli ishtaxa".
+Kassada TAQIQLANGAN: shaxsiy mavzularda baland ovozda gaplashish, mehmonni muhokama qilish, ish joyida ovqatlanish, mehmonni o'tirib kutib olish, qo'llarni cho'ntakka yoki kamar ustida ushlash, qo'lqopsiz ishlash, quloqchinda musiqa tinglash, mehmon bilan baxslashish, kassir menejer ruxsatisiz joyini tark etish, smenaga kech kelish.
+TAQIQLANGAN iboralar: "Hammasi shumi?", "Tanlab bo'ldingizmi?", "Siz aniq nimani xohlaysiz?", "Sizga nima kerak?", "Buyurtma berasizmi?", "Hali uzoq tanlaysizmi?".
+Ishga ruxsat berilmaydigan xodimlar: ichak infeksiyalari, LOR kasalliklari, teri kasalliklari, har qanday O'RVI belgilariga ega bo'lganlar.`,
+
+  food_safety:`Oziq-ovqat xavfsizligi — mehmonlarni sog'liq uchun xavfsiz mahsulot bilan ta'minlash.
+Yaroqlilik muddati o'tgan har bir mahsulot ishlatilishi QA'TIYAN MAN ETILADI.
+Yog'ochdan yasalgan doskalar va pichoqlardan foydalanish mumkin emas.
+Pichoq ranglari: Qizil — xom gosht; Sariq — limon; Yashil — sabzavotlar; Oq — non mahsulotlari.
+Mahsulot oshxonaga olib kirilganda BIRINCHI QADOQI BILAN KIRIB BO'LMAYDI — avval qog'oz qutidan bo'shatish kerak.
+Oshxonaga kirgan mahsulotning ikkilamchi saqlash muddati (markirovkasi) belgilanishi SHART.
+Hech qaysi mahsulotni yerga (polga) qo'ymang.
+FIFO qoidasi — birinchi kelgan mahsulot birinchi ishlatiladi.
+Mahsulotlarni qabul qilish jarayonida doimo PBO menejeri boshchilik qilishi shart.
+Qabul qilish TAQIQLANGAN holatlar: yorliqsiz mahsulotlar, ezilgan korobkalar, zararkunandalari bilan kasallangan, mog'or yoki chirigan sabzavotlar, muzlatilgan mahsulotlar erigan bo'lsa.
+Mahsulotlarni qabul qilish tartibi: 1) sovutkichda saqlanishi kerak bo'lganlar, 2) muzlatilgan mahsulotlar, 3) xona haroratida saqlanishi kerak bo'lganlar.
+Muzlatgich va sovutgich kameralarini o'chirish TAQIQLANADI.`,
+
+  storage:`Muzlatgich harorati: -18°C dan -23°C gacha.
+Sovutgich harorati: +1°C dan +5°C gacha.
+Vitrina sovutgichlar ichimlik uchun: +10°C dan +12°C gacha.
+Vitrina sovutgichlar mahsulotlar uchun: +1°C dan +5°C gacha.
+Zal (issiq mavsumda): +24°C dan +26°C gacha.
+Ombor: +18°C dan +20°C gacha.
+Muzlatilgan kartoshka fri — -18 dan -23°C; pishirilgandan so'ng 10 daqiqa.
+Hot dog sosiskasi — muzlatgichda; defrostatsiya uchun +1 +5°C da 12 soat; oshxonada 12 soat.
+Donar tovuq go'shti — muzlatgichda; defrostatsiya 12 soat; multixolderda 20 daqiqa.
+Donar mol go'shti — muzlatgichda; pishgan holda multixolderda 40 daqiqa.
+Kotlet — muzlatgichda; pishgan holda multixolderda 20 daqiqa.
+Strips, shnitsel, naggets — muzlatgichda; pishgandan so'ng multixolderda 20 daqiqa.
+Bodring — +1 +5°C da 72 soat; kesib tayyorlanganidan so'ng 2 soat.
+Pomidor — +1 +5°C da 72 soat; kesib tayyorlanganidan so'ng 1 soat.
+Ko'katlar — +1 +5°C da 24 soat.
+Piyoz — +1 +5°C da 72 soat; kesilganidan so'ng 2 soat.
+Aysberg — oshxonada 2 soat.
+Tuzlangan bodring — oshxonada 12 soat.
+Souslar (mayonez, ketchup va boshqalar) — qadoq ochilgandan so'ng 6 soat.
+Shirinliklar (ponchiklar) — defrostatsiya xona haroratida 1 soat; +1 +5°C da 72 soat.
+Siroplar — qadoq ochilgandan so'ng +1 +5°C da 30 kun.
+Pishloq — oshxonada 2 soat.
+Sut — ochilgan qadoq sovutgichda 12 soat.
+Non mahsulotlari — +18 dan +20°C gacha.
+FIFO qoidasiga rioya qiling. Oziq-ovqat va nooziq-ovqat mahsulotlarni bir polkada saqlash mumkin emas.
+Xom, yarim tayyor va sut mahsulotlari alohida saqlanishi kerak.
+Xom donar go'sht va xom kotlet birga saqlash mumkin.`,
+
+  cooking:`Donar go'shti: ichki harorat kamida +70°C - +75°C bo'lishi kerak.
+Kesilgan go'shtning qalinligi 3-4 mm dan oshmasligi kerak.
+Birinchi partiya (10 kg, 20 kg, 30 kg) — 20-25 daqiqa past olovda.
+Keyingi partiyalar (sloylar) — 3-4 daqiqa past olovda.
+Go'shtning o'z o'qi atrofida aylanish vaqti — 1 daqiqa.
+Kartoshka fri/po-derevenski: tayyorlash vaqti 2 daqiqa 45 soniya.
+30 soniyadan keyin "sheyk taym" (silkitish).
+Frituyr yog'i harorati 175°C.
+Issiq bindagi kartoshka 10 daqiqa davomida saqlanadi.
+Kotlet: 280 daraja haroratda pishirish. Birinchi tomonini 1:30 daqiqa, ikkinchi tomonini 1 daqiqa.
+Keyin kotlet har 30 soniyada 3 marta aylantiriladi (hammasi bo'lib 5 marta).
+Kotletni tayyorlash umumiy vaqti — 4 daqiqa.
+Kotlet tayyor bo'lgach ichki harorati kamida 70-75°C.
+Pishirilgan kotletlarni multiholderda saqlash — 20 daqiqa.
+Yaroqsiz frituyr yog'i belgilari (5 ta): tutash boshlaydi; hidi o'zgaradi; ta'mi achchiqroq; qoraroq; pufakchalar paydo bo'ladi va qaynaydi.
+Garnir guruch risovarkada tayyor holatda 4 soatdan ko'p emas.`,
+
+  cashier:`Naqd pulni kassa tortmasiga ko'ndalang qo'yish kerak.
+Qaytimni mehmonga eshitarli qilib aytish.
+Chekni "Tanlovingiz uchun rahmat" bilan uzatish.
+Mehmonga birinchi qog'oz pul, keyin tanga qaytim beriladi.
+Naqd pulni kassadan tashqarida saqlash TAQIQLANADI.
+Katta nominal pullar mehmon ko'zidan uzoqda bo'lishi shart.
+Kassa tortmasi doim yopiq bo'lishi shart.
+Mehmon shaxsiy kartasini qo'lga olish va parolini so'rash TAQIQLANADI.
+3-4 kichik paket bo'lsa — tutqichli katta paketga joylash kerak.
+Buyurtma berganida "ГОТОВ" tugmasini bosib chaqirish.
+Patnisni qo'ldan qo'lga bermang — mehmonga yaqinlashtiring.
+Buyurtma berganida "sizni yana kutib qolamiz", "tanlovingiz uchun rahmat", "yoqimli ishtaxa".`,
+
+  cleaning:`MAXWAY zonalari: Ko'k zona — mehmonlar zali va bolalar o'yingohi. Qizil zona — hojatxonalar. Sariq zona — oshxona.
+Hojatxonalarni tozalashda fartukni yechib, bir martalik xalatni kiyish zarur.
+Tozalovchi kimyoviy vositalar 3 turi: yuvuvchilar (tozalash), dezinfeksiyalovchi (virus va bakteriyalarni yo'q qilish), himoya vositalari.
+Pollarni yuvish 3 holda: kun davomida, ifloslanishiga qarab, eng intensiv davr tugagandan so'ng.
+Pollarni yuvishni mehmonlar kam bo'lgan zonalardan boshlash.
+Pol yuvish bosqichlari: 1) supurish; 2) inventar tayyorlash; 3) sakkiz shaklida yuvish; 4) quritish.
+Hojatxonani tozalash tig'iz soatlardan oldin va keyin; tig'iz soatlarda har 15 daqiqada.
+3 vannali tizim: 1) dastlabki tozalash, 2) yuvish (cho'tka va gel), 3) chayish (oqayotgan suv), 4) dezinfeksiya (Deson Ultra), 5) quritish va yopiq konteynerlarda saqlash.
+Nam pol tablichkasini pol qurigandan keyin olib tashlash.`,
+
+  mst:`MST — Madaniyat, Sifat, Tozalik.
+Madaniyat: xushmuomalalik, ko'z aloqasi, tabassum, samimiy muloqot.
+Sifat: ingredientlar kompaniya standartlariga javob berishi, yig'ish ketma-ketligiga rioya qilish.
+Tozalik: kiyimlar, qo'llar, ish joyi doimo toza bo'lishi.
+Mehmonlar kutishlari: sifatli mahsulotlar, xushmuomala xodimlar, aniq buyurtma, tezkor xizmat, toza restoran.
+To'g'ri salomlashish — mehmon kayfiyatini ijobiy o'zgartiradi.
+Har bir xodim — xoh oshpaz, xoh direktor — mahsulot sifati uchun javobgar.
+PBO ning barcha xodimlari birgalikda sifatli oziq-ovqat tayyorlash, tezkor va do'stona xizmat ko'rsatish va tozalikni nazorat qilish ustida ishlaydi.`,
+
+  recipes:`Sendvich og'irligi: 375 gramm. Gamburger og'irligi: 250 gramm. Bigburger og'irligi: 355 gramm.
+Lavash original og'irligi: 345 gramm. Achchiq lavash og'irligi: 345 gramm.
+Shaurma og'irligi: 340 gramm. Tovuqli shaurma og'irligi: 350 gramm. Mini shaurma og'irligi: 234 gramm.
+Donar roll og'irligi: 216 gramm. Donar kebab og'irligi: 330 gramm. German donar og'irligi: 320 gramm.
+Chizburger og'irligi: 260 gramm. Hot dog og'irligi: 165 gramm. Chiz-dog og'irligi: 175 gramm.
+Longer og'irligi: 150 gramm. Qizil karamli salat og'irligi: 660 gramm.
+Kartoshka fri S o'lcham: 60 gramm; M: 100 gramm; L: 150 gramm.
+Kartoshka po-derevenski: 100 gramm.
+Strips S — 3 dona; M — 5 dona; L — 7 dona.
+Naggets S — 6 dona; M — 10 dona; L — 18 dona.
+Choy (mevali, limonli, oddiy) hajmi: 330 ml.
+Ice-tea va Moxito klassik hajmi: 445 ml.
+Gamburger tarkibi: noni, burger sousi, aysberg, pomidor, marinadlangan bodring, piyoz, kotlet, pishloq.
+Sendvich tarkibi: toaster noni, sendvich sousi, pomidor, Hochland pishloq, toaster noni, sendvich sousi, bodring, shnitsel.
+Lavash original tarkibi: lavash hamiri, pomidor, kartoshka chipslari, donar go'shti, mayonez, tomat sousi.`
+};
+
+const TOPIC_NAMES = {
+  appearance:"Tashqi Ko'rinish", hygiene:"Shaxsiy Gigiyena",
+  service:"Xizmat Ko'rsatish", food_safety:"Oziq-ovqat Xavfsizligi",
+  storage:"Saqlash Standartlari", cooking:"Pishirish Standartlari",
+  cashier:"Kassa va To'lov", cleaning:"Tozalash Standartlari",
+  mst:"MST Tamoyili", recipes:"Stansion Kartalar"
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let questions = [], curIdx = 0, ok = 0, err = 0, answered = false;
+let userAnswers = [], perCount = 5, selTopics = [];
+let lastCfg = {};
+
+// ============================================================
+// SETUP UI
+// ============================================================
+function updateCount(v) {
+  perCount = parseInt(v);
+  const box = document.getElementById('count-box');
+  box.textContent = v;
+  box.classList.remove('bump');
+  void box.offsetWidth;
+  box.classList.add('bump');
+  updateHint();
+  updateBadges();
+}
+
+function updateHint() {
+  const active = document.querySelectorAll('.topic-btn.active').length;
+  const total = active * perCount;
+  document.getElementById('count-hint').innerHTML =
+    `${active} ta mavzu × ${perCount} = <strong>${total}</strong> ta savol jami`;
+}
+
+function updateBadges() {
+  document.querySelectorAll('.topic-btn.active .t-count').forEach(el => {
+    el.textContent = perCount;
+  });
+}
+
+function toggleTopic(btn) {
+  btn.classList.toggle('active');
+  updateHint();
+  updateBadges();
+}
+
+function selectAll(val) {
+  document.querySelectorAll('.topic-btn').forEach(btn => {
+    btn.classList.toggle('active', val);
+  });
+  updateHint();
+  updateBadges();
+}
+
+// init
+updateHint();
+updateBadges();
+
+// ============================================================
+// START QUIZ
+// ============================================================
+async function startQuiz() {
+  selTopics = [...document.querySelectorAll('.topic-btn.active')].map(b => b.dataset.topic);
+  document.getElementById('err-box').style.display = 'none';
+  if (!selTopics.length) {
+    document.getElementById('err-box').style.display = 'block';
+    return;
+  }
+  lastCfg = { topics: [...selTopics], per: perCount };
+
+  // Page exit anim
+  const setup = document.getElementById('setup');
+  setup.classList.add('page-exit');
+  await delay(300);
+  setup.style.display = 'none';
+  setup.classList.remove('page-exit');
+
+  document.getElementById('loading').style.display = 'block';
+  document.getElementById('gen-per').textContent = perCount;
+  await generateQuestions(selTopics, perCount);
+}
+
+// ============================================================
+// AI GENERATION — per topic, then interleave
+// ============================================================
+async function generateQuestions(topics, perTopic) {
+  const allQ = [];
+
+  // Build knowledge string
+  let kb = '';
+  topics.forEach(t => { kb += `\n=== ${TOPIC_NAMES[t]} ===\n${KB[t]}\n`; });
+
+  const prompt = `Siz MAXWAY fast-food kompaniyasining xodimlarini o'qitish uchun test savollar yaratmoqdasiz.
+
+Quyidagi bilimlar asosida har bir mavzudan ANIQ ${perTopic} ta savol yarating.
+Mavzular: ${topics.map(t=>TOPIC_NAMES[t]).join(', ')}
+
+BILIMLAR:
+${kb}
+
+QOIDALAR:
+- Faqat berilgan bilimlar asosida savollar yarating
+- Har bir mavzudan ANIQ ${perTopic} ta savol bo'lsin
+- Har bir savol 4 ta javob variantiga ega (A, B, C, D)
+- Faqat 1 ta to'g'ri javob
+- Savollar o'zbekcha
+- Turli xil qiyinlik darajalari
+- topic maydoni: mavzu kodi (${topics.join(', ')})
+- Qisqa izoh qo'shing
+
+FAQAT JSON MASSIV FORMATIDA JAVOB BERING — boshqa hech narsa yozmang, markdown ham yo'q:
+[{"topic":"kod","topicName":"Nomi","question":"?","options":["A","B","C","D"],"correct":0,"explanation":"..."}]`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-6", max_tokens: 1000,
+        messages: [{ role: "user", content: prompt }]
+      })
+    });
+    const data = await res.json();
+    let txt = data.content.map(i => i.text||'').join('');
+    txt = txt.replace(/```json|```/g,'').trim();
+    const match = txt.match(/\[[\s\S]*\]/);
+    if (!match) throw new Error('no json');
+    const parsed = JSON.parse(match[0]);
+    if (!Array.isArray(parsed) || !parsed.length) throw new Error('empty');
+    allQ.push(...parsed);
+  } catch {
+    // fallback
+    topics.forEach(t => {
+      const pool = getFallback(t);
+      const shuffled = pool.sort(()=>Math.random()-0.5);
+      allQ.push(...shuffled.slice(0, perTopic));
+    });
+  }
+
+  // Interleave by topic (round-robin shuffle)
+  questions = interleave(allQ, topics, perTopic);
+  startTest();
+}
+
+// Interleave: take 1 from each topic in rotation, shuffling within each topic
+function interleave(all, topics, perTopic) {
+  // Group by topic
+  const grouped = {};
+  topics.forEach(t => { grouped[t] = all.filter(q=>q.topic===t).sort(()=>Math.random()-0.5); });
+
+  const result = [];
+  // Round-robin: each round pick one from each topic
+  for (let i = 0; i < perTopic; i++) {
+    // Shuffle topics order each round for variety
+    const roundTopics = [...topics].sort(()=>Math.random()-0.5);
+    roundTopics.forEach(t => {
+      const arr = grouped[t] || [];
+      if (arr[i]) result.push(arr[i]);
+    });
+  }
+  return result;
+}
+
+// ============================================================
+// FALLBACK QUESTIONS
+// ============================================================
+function getFallback(topic) {
+  const map = {
+    appearance:[
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Xodimlarga uniformada uydan kelish qanday?",options:["Ruxsat","Faqat kechqurun","Qatiyan taqiqlanadi","Faqat menejerga ruxsat"],correct:2,explanation:"Uniformada uydan kelish yoki uyga ketish qatiyan taqiqlanadi."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Poshna balandligi necha sm dan oshmasligi kerak?",options:["3 sm","5 sm","2 sm","4 sm"],correct:2,explanation:"Poshna balandligi 2 sm dan oshmasligi kerak."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Beydj ko'ylakning qaysi tomoniga taqiladi?",options:["O'ng","Chap","Orqa","Istalgan"],correct:1,explanation:"Beydj ko'ylakning chap tomoniga, ko'krak chizig'i ustiga taqiladi."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Oshxona zonasida nima kiyish shart?",options:["Qo'lqop","Baxila (to'r)","Kurtka","Maxsus kombinezon"],correct:1,explanation:"Ishlab chiqish zonasida hamma bir martalik to'r (baxila) kiyishi shart."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Tirnoqlarga nisbatan qoida qanday?",options:["Istalgan uzunlikda","Bo'yalgan bo'lishi mumkin","Tekis olingan, bo'yalgan taqiqlanadi","Uzun bo'lishi mumkin"],correct:2,explanation:"Tirnoqlar doimo tekis olingan holatda; bo'yalgan yoki uzun tirnoqlar taqiqlanadi."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Erkaklar yuziga nisbatan qoida?",options:["Soqol ruxsat","Yengil soqol ruxsat","Soqol bo'lishi mumkin","To'liq soqoldan tozalangan bo'lishi kerak"],correct:3,explanation:"Erkaklar yuzi to'liq soqoldan tozalangan bo'lishi kerak, yengil soqolga ham ruxsat etilmaydi."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Ish vaqtida qaysi taqinchoqqa ruxsat etiladi?",options:["Soat","Bilakuzuk","Nikoh uzuk","Zirак"],correct:2,explanation:"Ish vaqtida faqat nikoh uzukka istisno tarzida ruxsat etiladi."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Forma qanchalik yuvilishi kerak?",options:["Haftada bir","Har kuni","Oyda bir","Ifloslanganida"],correct:1,explanation:"Forma doim yuvilgan va dazmollangan bo'lishi kerak, formani har kuni yuving."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"Ayol menejer poshna qoidasi?",options:["Istalgan balandlik","2 sm dan baland bo'lmasin","5 sm dan baland bo'lmasin","Poshna bo'lmasligi kerak"],correct:1,explanation:"Ayol menejerlar uchun oyoq kiyimining poshnasi 2 sm dan baland bo'lmasligi kerak."},
+      {topic:"appearance",topicName:"Tashqi Ko'rinish",question:"PBO xodimi forma ustiga nima kiyishi mumkin?",options:["Istalgan kiyim","Jilet (sovuq mavsumda)","Sviter","Hech narsa"],correct:1,explanation:"Sovuq mavsumlarda ustidan to'q rangli yoki kompaniyaning maxsus jiletlaridan foydalanishga ruxsat etiladi."}
+    ],
+    hygiene:[
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qo'llarni yuvish kamida qancha vaqt?",options:["10 soniya","15 soniya","20 soniya","30 soniya"],correct:2,explanation:"Qo'l yuvish jarayoni kamida 20 soniya davom etishi kerak."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qo'lqoplar kimlar uchun majburiy?",options:["Faqat oshpazlar","Kassir va zal xodimlaridan boshqa hammaga","Barcha xodimlar","Faqat menejerlar"],correct:1,explanation:"Qo'lqoplar kassir va zal xodimlaridan boshqa barcha xodimlar uchun majburiy."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qo'llarni qanday suvda yuvish kerak?",options:["Sovuq suv","Iliq suv","Issiq suv","Istalgan"],correct:1,explanation:"Qo'llarni iliq suvda yuvish kerak — sovuq suv to'liq tozalamaydi."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qo'l yuvishdagi asos necha qadam?",options:["3 qadam","5 qadam","Tirsakgacha sovunlash kamida 20 soniya","10 qadam"],correct:2,explanation:"Qo'llarni tirsakgacha sovunlash, barmoqlar orasini, kaftlarni, tirnoq ostini ishqalash — kamida 20 soniya."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qo'llarni quritishda nima taqiqlanadi?",options:["Qog'oz sochiq","Havo","Formaga artish","Quritish mashina"],correct:2,explanation:"Qo'llarni quritayotganda hech qanday yuzaga tekkizmaslik: na forma, na fartuk, na boshqa yuzalarga."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Tana ochiq qismida nima bo'lmasligi kerak?",options:["Soch","Tatuirovka","Zirак","Uzuk"],correct:1,explanation:"Tananing ochiq qismlarida tatuirovka bo'lmasligi kerak."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Xodimlar bir-birining formasidan foydalanishi...",options:["Mumkin","Faqat favqulodda holatlarda","MUMKIN EMAS","Menejer ruxsati bilan mumkin"],correct:2,explanation:"Xodimlar bir-birlarining formalaridan FOYDALANA OLMAYDI."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qachon qo'l yuvish shart emas?",options:["Smena boshida","Dam olishdan keyin (hojatxonasiz)","Xojatxonadan keyin","Xom mahsulot bilan ishlaganida"],correct:1,explanation:"Dam olishdan keyin (hojatxonaga bormasdan) qo'l yuvish majburiy emas, lekin boshqa barcha holatlarda majburiy."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"O'tkir hidli parfyumeriya...",options:["Tavsiya etiladi","Ruxsat etiladi","Maqsadga muvofiq emas","Majburiy"],correct:2,explanation:"O'tkir hidli parfumeralardan foydalanish maqsadga muvofiq emas."},
+      {topic:"hygiene",topicName:"Shaxsiy Gigiyena",question:"Qog'oz sochiq bilan quritgandan keyin jo'mrak qanday yopiladi?",options:["Qo'l bilan","Qog'oz sochiq bilan","Tirsak bilan","Istalgan"],correct:1,explanation:"Qog'oz sochiq bilan quritilsa, jo'mrakni ham sochiq bilan yopish va sochiqni axlatga tashlash kerak."}
+    ],
+    service:[
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"MST nimani anglatadi?",options:["Maxsus Saqlash Tartibi","Madaniyat, Sifat, Tozalik","Mehmonlarga Sifatli Ta'minot","Maxway Standart Talablari"],correct:1,explanation:"MST — Madaniyat, Sifat va Tozalik tamoyili."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Mehmonni kutib olishda qanday salomlashiladi?",options:["Salom","Xush kelibsiz","Assalomu alaykum MAX WAY ga xush kelibsiz","Buyurtma bering"],correct:2,explanation:"Kassir mehmonni ko'z aloqasi, tabassum va qo'lini ko'ksiga qo'yib salomlashadi."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Bolalarga qo'shimcha taom taklif qilish...",options:["Majburiy","Ruxsat etiladi","MUMKIN EMAS","Menejer ruxsati bilan mumkin"],correct:2,explanation:"Bolalarga qo'shimcha taom taklif qilish va ikki marta maslahat berish MUMKIN EMAS."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Padnosga eng avval nima qo'yiladi?",options:["Muzqaymoq","Kartoshka fri","Kondimentlar","Issiq ichimlik"],correct:2,explanation:"Padnosga birinchi kondimentlar, keyin issiq taomlar/ichimlik, sovuq ichimlik, kartoshka fri va muzqaymoq qo'yiladi."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"\"Hammasi shumi?\" iborasi nima?",options:["Tavsiya etiladi","Majburiy","TAQIQLANADI","Faqat o'zbek tilida ruxsat"],correct:2,explanation:"\"Hammasi shumi?\", \"Tanlab bo'ldingizmi?\" va shunga o'xshash iboralar taqiqlanadi."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Issiq va sovuq taomlarni padnosda qanday joylashtirish kerak?",options:["Istalgan tarzda","Bir tomonga","Ikki tomoniga alohida","Bir-birining ustiga"],correct:2,explanation:"Patnosning bir tomoniga issiq taomlar, ikkinchisiga sovuq taomlar qo'yiladi, bir-biriga tegmasligi kerak."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Qaysi kasallik bo'lsa ishga ruxsat yo'q?",options:["Bosh og'rig'i","Ichak infeksiyasi","Charchoq","Uyqu yetishmasligi"],correct:1,explanation:"Ichak infeksiyalari, LOR kasalliklari, teri kasalliklari va O'RVI belgilarida ishga ruxsat berilmaydi."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Olib ketishga buyurtmada issiq va sovuq taomlar qanday solinadi?",options:["Bitta paketga","Har xil paketlarga","Istalgan tarzda","Faqat bitta paket"],correct:1,explanation:"Olib ketishda issiq va sovuq taomlar har xil paketlarga solinadi."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Kassir joyini qachon tark etishi mumkin?",options:["Istalgan vaqtda","Faqat smena oxirida","Smena menejer ruxsati bilan","Dam olish paytida"],correct:2,explanation:"Kassir smena menejer ruxsatisiz joyini tark etish TAQIQLANADI."},
+      {topic:"service",topicName:"Xizmat Ko'rsatish",question:"Mahsulot logotipi padnosdа qaysi tomonga qaratilishi kerak?",options:["Xodimga","Mehmonga","Pastga","Ahamiyati yo'q"],correct:1,explanation:"Padnosdagi mahsulot logotipi mexmonga qaratilgan bo'lishi kerak."}
+    ],
+    food_safety:[
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Qizil rangli pichoq qanday mahsulot uchun?",options:["Sabzavotlar","Non mahsulotlari","Xom gosht","Limon"],correct:2,explanation:"Qizil pichoq — xom gosht uchun."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Mahsulot oshxonaga qanday olib kirilishi kerak?",options:["Birinchi qadoqi bilan","Qog'oz qutidan bo'shatib","Istalgan holatda","Faqat menejer bilan"],correct:1,explanation:"Mahsulot birinchi qadoqi bilan emas, avval qog'oz qutidan bo'shatib olib kirilishi kerak."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"FIFO qoidasi nimani anglatadi?",options:["Kechroq kelgan birinchi","Birinchi kelgan birinchi ishlatiladi","Og'irroq birinchi","Ahamiyati yo'q"],correct:1,explanation:"FIFO — First In First Out: birinchi kelgan mahsulot birinchi ishlatiladi."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Sariq pichoq qanday mahsulot uchun?",options:["Gosht","Sabzavotlar","Limon","Non"],correct:2,explanation:"Sariq rangli pichoq va doska limon uchun."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Yashil pichoq qanday mahsulot uchun?",options:["Gosht","Sabzavotlar","Limon","Non"],correct:1,explanation:"Yashil rangli pichiq va doska sabzavotlar uchun."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Muddati o'tgan mahsulot...",options:["Kamroq ishlatiladi","Bir kunda ishlatib qo'yiladi","QA'TIYAN ISHLATILMAYDI","Menejer ruxsati bilan ishlatiladi"],correct:2,explanation:"Yaroqlilik muddati o'tgan har bir mahsulot ishlatilishi qa'tiyan man etiladi."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Mahsulotni qabul qilishda kim boshchilik qilishi shart?",options:["Har qanday xodim","Kassir","PBO menejeri","Oshpaz"],correct:2,explanation:"Mahsulotlarni qabul qilish jarayonida doimo PBO menejeri boshchilik qilishi shart."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Qaysi holda mahsulot qabul qilish taqiqlanadi?",options:["Yorliq mavjud bo'lsa","Korobka butun bo'lsa","Muzlatilgan mahsulot erigan bo'lsa","Harorati to'g'ri bo'lsa"],correct:2,explanation:"Muzlatilgan mahsulotlar erigan bo'lsa qabul qilish taqiqlanadi."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Yog'ochdan yasalgan doskalar...",options:["Ruxsat etiladi","Faqat oshxonada","MUMKIN EMAS","Sabzavotlar uchun mumkin"],correct:2,explanation:"Yog'ochdan yasalgan doskalar va pichoqlardan foydalanish mumkin emas."},
+      {topic:"food_safety",topicName:"Oziq-ovqat Xavfsizligi",question:"Mahsulot oshxonaga kirgandan keyin nima belgilanishi shart?",options:["Narxi","Og'irligi","Ikkilamchi saqlash muddati (markirovkasi)","Rangi"],correct:2,explanation:"Oshxonaga kirgan mahsulotning ikkilamchi saqlash muddati (markirovkasi) belgilanishi shart."}
+    ],
+    storage:[
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Muzlatgich harorati qancha?",options:["+1 dan +5°C","−18 dan −23°C","0 dan −5°C","+10 dan +12°C"],correct:1,explanation:"Muzlatgich harorati -18°C dan -23°C gacha bo'lishi kerak."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Kesilgan pomidorning saqlash muddati?",options:["2 soat","30 daqiqa","1 soat","3 soat"],correct:2,explanation:"Kesilgan pomidorning saqlash muddati 1 soat."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Kesilgan bodringning saqlash muddati?",options:["1 soat","2 soat","30 daqiqa","3 soat"],correct:1,explanation:"Kesilgan bodringning saqlash muddati 2 soat."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Pishirilgan kartoshka fri necha daqiqa saqlanadi?",options:["5 daqiqa","10 daqiqa","20 daqiqa","30 daqiqa"],correct:1,explanation:"Issiq bindagi kartoshka 10 daqiqa davomida saqlanadi."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Sovutgich harorati qancha?",options:["−5 dan 0°C","0 dan +3°C","+1 dan +5°C","+5 dan +10°C"],correct:2,explanation:"Sovutgich harorati +1°C dan +5°C gacha bo'lishi kerak."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Tuzlangan bodringning oshxonadagi saqlash muddati?",options:["2 soat","6 soat","12 soat","24 soat"],correct:2,explanation:"Tuzlangan bodringning saqlash muddati 12 soat."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Souslar (mayonez, ketchup) qadoq ochilgandan so'ng qancha saqlanadi?",options:["2 soat","6 soat","12 soat","24 soat"],correct:1,explanation:"Souslar qadoq ochilgandan so'ng 6 soat saqlanadi."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Ombor harorati qancha bo'lishi kerak?",options:["+10 dan +15°C","+15 dan +18°C","+18 dan +20°C","+20 dan +24°C"],correct:2,explanation:"Ombor harorati +18°C dan +20°C gacha bo'lishi kerak."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Xom donar go'sht va xom kotletni birga saqlash...",options:["Taqiqlanadi","Mumkin","Faqat muzlatgichda mumkin","Faqat sovutgichda taqiq"],correct:1,explanation:"Xom donar go'sht va xom kotlet birga saqlash mumkin."},
+      {topic:"storage",topicName:"Saqlash Standartlari",question:"Ko'katlarning saqlash muddati?",options:["12 soat","24 soat","48 soat","72 soat"],correct:1,explanation:"Ko'katlar +1 dan +5°C da 24 soatdan ko'p emas saqlanadi."}
+    ],
+    cooking:[
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Kartoshka fri pishirish vaqti qancha?",options:["2 daqiqa","2 daqiqa 45 soniya","3 daqiqa 30 soniya","5 daqiqa"],correct:1,explanation:"Kartoshka fri tayyorlash vaqti 2 daqiqa 45 soniya."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Frituyr yog'i harorati qancha bo'lishi kerak?",options:["150°C","160°C","175°C","200°C"],correct:2,explanation:"Frituyr yog'i harorati 175°C bo'lishi kerak."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Pishirilgan kotletni multiholderda qancha saqlash mumkin?",options:["10 daqiqa","20 daqiqa","30 daqiqa","1 soat"],correct:1,explanation:"Pishirilgan kotletlarni multiholderda saqlash muddati 20 daqiqa."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Kotlet pishirish harorati qancha?",options:["180°C","220°C","250°C","280°C"],correct:3,explanation:"Kotlet izgarada 280 daraja haroratda pishiriladi."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Kartoshka frini 30 soniyadan keyin nima qilish kerak?",options:["Olib chiqish","Sheyk taym (silkitish)","Haroratni oshirish","Yana 30 soniya kutish"],correct:1,explanation:"30 soniyadan keyin sheyk taym (silkitish) bajariladi."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Donar go'shti tayyor bo'lganda ichki harorat qancha bo'lishi kerak?",options:["+60°C","+ 65°C","+70°C dan +75°C gacha","+80°C"],correct:2,explanation:"Donar go'shti tayyor bo'lganda ichki harorat kamida +70°C - +75°C bo'lishi kerak."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Kotletni tayyorlash umumiy vaqti qancha?",options:["2 daqiqa","3 daqiqa","4 daqiqa","5 daqiqa"],correct:2,explanation:"Kotletni tayyorlashning umumiy vaqti 4 minut, taymer orqali boshqariladi."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Yaroqsiz frituyr yog'ining nechtа belgisi bor?",options:["3 ta","4 ta","5 ta","6 ta"],correct:2,explanation:"Yaroqsiz frituyr yog'i 5 ta belgi bilan aniqlanadi."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Birinchi partiya donar go'shtini pishirish vaqti?",options:["5-10 daqiqa","10-15 daqiqa","20-25 daqiqa","30-40 daqiqa"],correct:2,explanation:"Birinchi partiyaning go'shtini tayyorlash vaqti 20-25 daqiqa past olovda."},
+      {topic:"cooking",topicName:"Pishirish Standartlari",question:"Garnir guruch risovarkada qancha saqlanadi?",options:["2 soat","4 soat","6 soat","8 soat"],correct:1,explanation:"Garnir guruch risovarkada tayyor holatda 4 soat ko'p emas saqlanadi."}
+    ],
+    cashier:[
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Naqd pul kassa tortmasiga qanday qo'yiladi?",options:["Tik holatda","Ko'ndalang","Burma qilib","Istalgan"],correct:1,explanation:"Naqd pul kassa tortmasiga ko'ndalang qo'yiladi."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Mehmonga qaytim qanday beriladi?",options:["Birinchi tanga, keyin qog'oz","Birinchi qog'oz pul, keyin tanga","Istalgan tartibda","Faqat tanga"],correct:1,explanation:"Mehmon bilan muloqotda mehmonga birinchi qog'oz pul va keyin tanga qaytim beriladi."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Kassa tortmasi qanday bo'lishi shart?",options:["Ochiq","Yarim ochiq","Doim yopiq","Faqat to'lovda ochiq"],correct:2,explanation:"Kassa tortmasi doim yopiq bo'lishi shart."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Mehmon kartasini qo'lga olish...",options:["Ruxsat etiladi","TAQIQLANADI","Menejer ruxsati bilan ruxsat","Faqat naqd bo'lmasa"],correct:1,explanation:"Mehmon shaxsiy kartasini qo'lga olish va parolini so'rash taqiqlanadi."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Naqd pul kassadan tashqarida saqlash...",options:["Mumkin","TAQIQLANADI","Faqat smena oxirida ruxsat","Menejer bilishi kerak"],correct:1,explanation:"Naqd pulni kassadan tashqarida saqlash taqiqlanadi."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"3-4 kichik paket bo'lsa xodim nima qilishi kerak?",options:["Shunday berish","Tutqichli katta paketga joylash","Mehmonni o'zi ko'tarsin","Qo'shimcha taklif qilish"],correct:1,explanation:"Agar buyurtmada kichik paketlar soni 3-4 bo'lsa xodim tutqichli katta paketga joylashtirib berishi kerak."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Chekni uzatishda qanday so'z aytiladi?",options:["Xayr","Yana keling","Tanlovingiz uchun rahmat","Marhamat"],correct:2,explanation:"Chekni 'Tanlovingiz uchun rahmat' degan so'zlar bilan uzating."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Buyurtma bergan mehmonni qanday chaqirish kerak?",options:["Ovoz bilan chaqirish","ГОТОВ tugmasini bosish","Yozib xabar berish","Ko'rib turish"],correct:1,explanation:"Buyurtma bergan mehmonni 'ГОТОВ' tugmasini bosish orqali chaqiriladi."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Katta nominal pullar qaerda saqlanishi kerak?",options:["Kassada yuqorida","Mehmon ko'zidan uzoqda","Cho'ntakda","Stolobrotda"],correct:1,explanation:"Katta nominal pullar mehmon ko'zidan uzoqda bo'lishi shart."},
+      {topic:"cashier",topicName:"Kassa va To'lov",question:"Patnisni mehmonga qanday berish kerak?",options:["Qo'ldan qo'lga","Mehmonga yaqinlashtirish","Stol ustiga qo'yish","Istalgan tarzda"],correct:1,explanation:"Patnisni qo'ldan qo'lga bermang — mehmon kelganda yaqinlashtiring."}
+    ],
+    cleaning:[
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Ko'k zona nima?",options:["Oshxona","Hojatxona","Mehmonlar zali va bolalar o'yingohi","Ombor"],correct:2,explanation:"Ko'k zona — mehmonlar zali va bolalar o'yingohi."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Pollarni yuvishni qayerdan boshlash kerak?",options:["Oshxonadan","Hojatxonadan","Mehmonlar kam bo'lgan zonadan","Kirish eshigidan"],correct:2,explanation:"Pollarni yuvishni mehmonlar kam bo'lgan zonalardan boshlang."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"3 vannali tizimning 4-bosqichi nima?",options:["Yuvish","Chayish","Dezinfeksiya","Quritish"],correct:2,explanation:"4. 3-vanna — dezinfeksiya: Deson Ultra dezinfeksiya vositasi qo'shiladi."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Tig'iz soatlarda hojatxona qancha vaqtda tozalanishi kerak?",options:["30 daqiqada","20 daqiqada","15 daqiqada","1 soatda"],correct:2,explanation:"Tig'iz soatlarda hojatxonani tozalash har 15 daqiqada bo'lishi kerak."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Hojatxonalarni tozalashda nima kiyish zarur?",options:["Fartuk","Bir martalik xalat","Qo'lqop","Kurtka"],correct:1,explanation:"Hojatxonalarni yoki boshqa xonalarni tozalash vaqtida fartukni yechish va bir martalik xalatni kiyish zarur."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Qizil zona nima?",options:["Oshxona","Hojatxonalar","Mehmonlar zali","Ombor"],correct:1,explanation:"Qizil zona — mehmonlar va xodimlar uchun hojatxonalar."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Pollarni yuvish qanday xarakatda amalga oshiriladi?",options:["To'g'ri chiziqda","Aylana shaklida","Sakkiz shaklida","Istalgan tarzda"],correct:2,explanation:"Shvabrani oldingizda tik holatda ushlab, polni sakkiz shaklida harakatlar bilan yuving."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"PBO da pollarni yuvish nechi holatda amalga oshiriladi?",options:["1 holat","2 holat","3 holat","4 holat"],correct:2,explanation:"PBO da pollarni yuvish 3 holatda: kun davomida, ifloslanishiga qarab, eng intensiv davr tugagandan so'ng."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Sariq zona nima?",options:["Mehmonlar zali","Hojatxona","Oshxona","Ombor"],correct:2,explanation:"Sariq zona — oshxona."},
+      {topic:"cleaning",topicName:"Tozalash Standartlari",question:"Nam pol tablichkasi qachon olib tashlanadi?",options:["Darhol","5 daqiqadan keyin","Pol qurigandan keyin","Smena oxirida"],correct:2,explanation:"Ehtiyot bo'ling, nam pol tablichkasini pol qurigandan keyin olib tashlang."}
+    ],
+    mst:[
+      {topic:"mst",topicName:"MST Tamoyili",question:"MST ning M harfi nimani anglatadi?",options:["Maxway","Madaniyat","Mahsulot","Menejer"],correct:1,explanation:"MST — Madaniyat, Sifat va Tozalik."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"Mehmonlar asosan nima kutishadi?",options:["Arzon narxlar","Sifatli mahsulot, xushmuomala xodim, tezkor xizmat","Ko'p tanlov","Katta porsiyalar"],correct:1,explanation:"Mehmonlar sifatli mahsulotlar, xushmuomala xodimlar, aniq buyurtma, tezkor xizmat va toza restoran kutishadi."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"Mahsulot sifati uchun kim javobgar?",options:["Faqat oshpaz","Faqat menejer","Har bir xodim — xoh oshpaz, xoh direktor","Faqat xodimlar"],correct:2,explanation:"Har bir xodim — xoh oshpaz, xoh direktor — mahsulot sifati uchun javobgar."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"To'g'ri salomlashish nimani o'zgartiradi?",options:["Buyurtmani","Mehmon kayfiyatini ijobiy","Narxni","Hech narsani"],correct:1,explanation:"To'g'ri salomlashish — bu o'zgarish qilish imkoniyatidir va mehmonda yaxshi taassurot qoldiradi."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"MST ning T harfi nimani anglatadi?",options:["Ta'lim","Tezlik","Tozalik","Tartib"],correct:2,explanation:"MST — Madaniyat, Sifat va Tozalik tamoyili."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"Salomlashayotganda nima qilish kerak?",options:["Qarab turish","Mehmonning ko'zlariga qarab tabassum qilish","Buyurtma so'rash","Bosh silkitish"],correct:1,explanation:"Salomlashayotganda mehmonning ko'zlariga qarang, tabassum qiling, sodda va samimiy muloqot yuriting."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"Tozalik mehmonlar uchun nimani bildiradi?",options:["Qo'shimcha xarajat","Mehmonlarning bizga bo'lgan ishonchini oshiruvchi omil","Ahamiyatsiz narsa","Faqat ko'rish uchun"],correct:1,explanation:"Tozalik bu mehmonlarning bizga bo'lgan ishonchini oshiruvchi omildir."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"PBO xodimlari birgalikda nima ustida ishlaydi?",options:["Foyda oshirish","Sifatli taom, tezkor xizmat, tozalikni nazorat qilish","Yangi mahsulotlar yaratish","Narxlarni belgilash"],correct:1,explanation:"PBO da barcha xodimlar sifatli oziq-ovqat tayyorlash, tezkor va do'stona xizmat ko'rsatish va tozalikni nazorat qilish ustida birgalikda ishlaydi."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"MST ning S harfi nimani anglatadi?",options:["Sanoat","Sifat","Sog'liq","Standart"],correct:1,explanation:"MST — Madaniyat, Sifat va Tozalik tamoyili."},
+      {topic:"mst",topicName:"MST Tamoyili",question:"Ingredientlar standartga javob bermasa nima bo'ladi?",options:["Baribir beriladi","Chegirma bilan beriladi","Mehmonlarga taqdim etilmaydi","Menejer qaror qiladi"],correct:2,explanation:"Agar ingredientlar kompaniya standartlariga javob bermasa, bunday mahsulot mehmonlarga taqdim etilmaydi."}
+    ],
+    recipes:[
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Sendvich og'irligi qancha?",options:["250 g","320 g","375 g","345 g"],correct:2,explanation:"Sendvich tayyor mahsulotining og'irligi 375 gramm."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Gamburger og'irligi qancha?",options:["250 g","320 g","375 g","355 g"],correct:0,explanation:"Gamburger tayyor mahsulotining og'irligi 250 gramm."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Kartoshka fri L o'lchami necha gramm?",options:["60 g","100 g","150 g","200 g"],correct:2,explanation:"Kartoshka fri L o'lchami 150 gramm."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Strips S o'lchami nechta?",options:["2 dona","3 dona","5 dona","7 dona"],correct:1,explanation:"Strips S o'lchami — 3 dona strips."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Naggets M o'lchami nechta?",options:["6 dona","8 dona","10 dona","15 dona"],correct:2,explanation:"Naggets M o'lchami — 10 dona naggets."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Ice-tea va Moxito klassik hajmi qancha?",options:["330 ml","350 ml","400 ml","445 ml"],correct:3,explanation:"Ice-tea va Moxito klassik hajmi 445 ml."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Hot dog og'irligi qancha?",options:["150 g","165 g","175 g","200 g"],correct:1,explanation:"Hot dog tayyor mahsulotining og'irligi 165 gramm."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Mini shaurma og'irligi qancha?",options:["200 g","220 g","234 g","250 g"],correct:2,explanation:"Mini shaurma tayyor mahsulotining og'irligi 234 gramm."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Choy (mevali, limonli) hajmi qancha?",options:["250 ml","300 ml","330 ml","400 ml"],correct:2,explanation:"Mevali choy, limonli choy, choy hajmi 330 ml."},
+      {topic:"recipes",topicName:"Stansion Kartalar",question:"Donar roll og'irligi qancha?",options:["200 g","216 g","234 g","250 g"],correct:1,explanation:"Donar roll tayyor mahsulotining og'irligi 216 gramm."}
+    ]
+  };
+  return map[topic] || [];
+}
+
+// ============================================================
+// TEST ENGINE
+// ============================================================
+function startTest() {
+  curIdx = 0; ok = 0; err = 0; userAnswers = [];
+  document.getElementById('loading').style.display = 'none';
+
+  // Build cat-strip (one dot per question)
+  const strip = document.getElementById('cat-strip');
+  strip.innerHTML = '';
+  questions.forEach((_,i) => {
+    const d = document.createElement('div');
+    d.className = 'cat-dot' + (i===0?' current':'');
+    d.id = 'dot-'+i;
+    strip.appendChild(d);
+  });
+
+  document.getElementById('quiz-area').style.display = 'block';
+  renderQ();
+}
+
+function renderQ() {
+  const q = questions[curIdx];
+  const total = questions.length;
+  answered = false;
+
+  // Progress
+  const pct = (curIdx / total) * 100;
+  document.getElementById('prog-fill').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = `Savol ${curIdx+1} / ${total}`;
+  document.getElementById('pill-c').textContent = `✅ ${ok}`;
+  document.getElementById('pill-w').textContent = `❌ ${err}`;
+
+  // Update dots
+  for (let i=0;i<total;i++) {
+    const d = document.getElementById('dot-'+i);
+    if (!d) continue;
+    d.className = 'cat-dot' + (i<curIdx?' done':(i===curIdx?' current':''));
+  }
+
+  // Question content
+  document.getElementById('q-badge').textContent = q.topicName || TOPIC_NAMES[q.topic] || q.topic;
+  document.getElementById('q-text').textContent = q.question;
+
+  // Options
+  const container = document.getElementById('opts');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D'];
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option';
+    btn.innerHTML = `<span class="opt-letter">${letters[i]}</span>${opt}`;
+    btn.onclick = () => selectAns(i, btn);
+    container.appendChild(btn);
+  });
+
+  // Explanation reset
+  const ex = document.getElementById('expl');
+  ex.style.display = 'none'; ex.innerHTML = '';
+
+  // Buttons
+  document.getElementById('next-btn').disabled = true;
+  document.getElementById('skip-btn').style.display = curIdx < total-1 ? '' : 'none';
+  document.getElementById('next-btn').textContent = curIdx < total-1 ? 'Keyingi →' : "Natijani ko'rish";
+
+  // Card animation
+  const card = document.getElementById('q-card');
+  card.classList.remove('enter');
+  void card.offsetWidth;
+  card.classList.add('enter');
+}
+
+function selectAns(idx, btn) {
+  if (answered) return;
+  answered = true;
+  const q = questions[curIdx];
+  const opts = document.querySelectorAll('.option');
+  opts.forEach(o => o.disabled = true);
+  opts[q.correct].classList.add('correct');
+  if (idx === q.correct) {
+    ok++;
+    userAnswers.push({q, chosen:idx, isCorrect:true});
+  } else {
+    btn.classList.add('wrong');
+    err++;
+    userAnswers.push({q, chosen:idx, isCorrect:false});
+  }
+  const ex = document.getElementById('expl');
+  ex.innerHTML = `<strong>💡 Izoh:</strong> ${q.explanation||''}`;
+  ex.style.display = 'block';
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('skip-btn').style.display = 'none';
+  document.getElementById('pill-c').textContent = `✅ ${ok}`;
+  document.getElementById('pill-w').textContent = `❌ ${err}`;
+}
+
+function skipQ() {
+  if (answered) return;
+  const q = questions[curIdx];
+  answered = true; err++;
+  userAnswers.push({q, chosen:-1, isCorrect:false});
+  const opts = document.querySelectorAll('.option');
+  opts.forEach(o => o.disabled = true);
+  opts[q.correct].classList.add('correct');
+  const ex = document.getElementById('expl');
+  ex.innerHTML = `<strong>✅ To'g'ri javob:</strong> ${q.explanation||''}`;
+  ex.style.display = 'block';
+  document.getElementById('skip-btn').style.display = 'none';
+  document.getElementById('next-btn').disabled = false;
+  document.getElementById('pill-w').textContent = `❌ ${err}`;
+}
+
+async function nextQ() {
+  // Exit animation
+  const card = document.getElementById('q-card');
+  card.classList.add('exit-left');
+  await delay(280);
+  card.classList.remove('exit-left');
+  curIdx++;
+  if (curIdx >= questions.length) { showResults(); }
+  else { renderQ(); }
+}
+
+// ============================================================
+// RESULTS + CONFETTI
+// ============================================================
+function showResults() {
+  document.getElementById('quiz-area').style.display = 'none';
+  document.getElementById('results').style.display = 'block';
+  window.scrollTo({top:0, behavior:'smooth'});
+
+  const total = questions.length;
+  const pct = Math.round((ok/total)*100);
+  document.getElementById('r-score').textContent = ok;
+  document.getElementById('r-tot').textContent = `/ ${total}`;
+  document.getElementById('s-ok').textContent = ok;
+  document.getElementById('s-err').textContent = err;
+  document.getElementById('s-pct').textContent = pct+'%';
+
+  let title, msg;
+  if (pct>=90){ title="🏆 A'lo natija!"; msg="Siz MAXWAY standartlarini mukammal bilasiz!"; }
+  else if(pct>=75){ title="✅ Yaxshi natija!"; msg="Asosiy standartlarni yaxshi bilasiz. Bir oz ko'rib chiqing."; }
+  else if(pct>=50){ title="📚 O'rta daraja"; msg="Standartlarni qayta o'qib chiqish tavsiya etiladi."; }
+  else { title="❗ Kamchilik bor"; msg="Kompaniya standartlarini diqqat bilan o'rganing."; }
+
+  document.getElementById('r-title').textContent = title;
+  document.getElementById('r-msg').textContent = msg;
+
+  if (pct >= 75) launchConfetti();
+
+  // Review with staggered animation
+  const list = document.getElementById('review-list');
+  list.innerHTML = '';
+  userAnswers.forEach((ua, i) => {
+    const div = document.createElement('div');
+    div.className = 'review-item'+(ua.isCorrect?'':' wrong');
+    div.style.animationDelay = (i*0.04)+'s';
+    const chosen = ua.chosen>=0 ? ua.q.options[ua.chosen] : "O'tkazib yuborildi";
+    div.innerHTML = `
+      <div class="q-badge" style="font-size:0.65rem;padding:2px 8px">${ua.q.topicName||ua.q.topic}</div>
+      <div class="review-q">${i+1}. ${ua.q.question}</div>
+      <div class="review-a">
+        ${ua.isCorrect
+          ? `<span class="rv-ok">✅ To'g'ri: ${ua.q.options[ua.q.correct]}</span>`
+          : `<span class="rv-err">❌ Sizning: ${chosen}</span><br><span class="rv-ok">✅ To'g'ri: ${ua.q.options[ua.q.correct]}</span>`
+        }
+      </div>`;
+    list.appendChild(div);
+  });
+}
+
+// ============================================================
+// CONFETTI
+// ============================================================
+function launchConfetti() {
+  const canvas = document.getElementById('confetti-canvas');
+  canvas.style.display = 'block';
+  const ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+  const pieces = [];
+  const colors = ['#FFD600','#7B5EA7','#27AE60','#fff','#5A4080','#FFB800'];
+  for (let i=0;i<160;i++) {
+    pieces.push({
+      x: Math.random()*canvas.width,
+      y: -20 - Math.random()*canvas.height,
+      r: 4+Math.random()*8,
+      d: 1.5+Math.random()*2.5,
+      color: colors[Math.floor(Math.random()*colors.length)],
+      tilt: Math.random()*10-10,
+      tiltAngle: 0,
+      tiltSpeed: 0.05+Math.random()*0.1,
+      rot: Math.random()*360,
+      rotSpeed: (Math.random()-0.5)*4,
+      shape: Math.random()>0.5?'rect':'circle'
+    });
+  }
+  let frame = 0;
+  function draw() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    pieces.forEach(p => {
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.9;
+      if (p.shape==='circle') {
+        ctx.beginPath();
+        ctx.arc(0,0,p.r,0,Math.PI*2);
+        ctx.fill();
+      } else {
+        ctx.fillRect(-p.r/2,-p.r/2,p.r,p.r*0.6);
+      }
+      ctx.restore();
+      p.y += p.d;
+      p.x += Math.sin(p.tiltAngle)*1.5;
+      p.tiltAngle += p.tiltSpeed;
+      p.rot += p.rotSpeed;
+      if (p.y > canvas.height) {
+        p.y = -10; p.x = Math.random()*canvas.width;
+      }
+    });
+    frame++;
+    if (frame < 220) requestAnimationFrame(draw);
+    else {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      canvas.style.display = 'none';
+    }
+  }
+  draw();
+}
+
+// ============================================================
+// NAV
+// ============================================================
+async function restartSame() {
+  document.getElementById('results').style.display = 'none';
+  document.getElementById('loading').style.display = 'block';
+  questions = []; curIdx = 0; ok = 0; err = 0; userAnswers = [];
+  await generateQuestions(lastCfg.topics, lastCfg.per);
+}
+
+function goBack() {
+  document.getElementById('results').style.display = 'none';
+  const setup = document.getElementById('setup');
+  setup.style.display = 'block';
+  setup.classList.remove('page-exit');
+  setup.classList.add('page');
+  setTimeout(()=>setup.classList.remove('page'), 600);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function delay(ms) { return new Promise(r=>setTimeout(r,ms)); }
+</script>
+</body>
+</html>
